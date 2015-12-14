@@ -2,6 +2,8 @@
 
 Phonegap builds available from https://build.phonegap.com/apps/1819363
 
+## Copyright Information & License
+
 Copyright (c) 2015, Ryan Mauger
 All rights reserved.
 
