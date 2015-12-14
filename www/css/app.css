@@ -1,0 +1,20 @@
+.runners-group {
+  background: #555555;
+}
+.runner {
+
+}
+.runner p {
+  font-size: 20px;
+}
+
+.split-list .label {
+  margin: 0px 10px;
+}
+
+.runner-interaction {
+  margin: 5px;
+  min-height: 40px;
+  padding: 5px;
+  border-radius: 5px;
+}
