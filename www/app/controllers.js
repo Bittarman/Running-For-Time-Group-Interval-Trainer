@@ -12,12 +12,12 @@ app.filter('timeify', [function () {
 
 app.controller('app', ['$scope', function ($scope) {
     $scope.editing = true;
+    $scope.complete = false;
 
     $scope.groups = {
-        "Fast": [
+        "Group 1": [
             //{name: "Matt Warr", time: "00:00", splits: [], lastSplit: 0},
-        ],
-        "Slow": []
+        ]
     };
 
     $scope.begin = function () {
@@ -26,12 +26,19 @@ app.controller('app', ['$scope', function ($scope) {
     };
 
     $scope.reset = function () {
-        $scope.$broadcast('reset', 'reset');
-        $scope.groups = {
-            "Fast": [],
-            "Slow": []
-        };
-        $scope.editing = true;
+        if (confirm ('Are you sure?')) {
+            $scope.$broadcast('reset', 'reset');
+            for (var i in $scope.groups) {
+                delete $scope.groups[i];
+            }
+            $scope.groups = {};
+            $scope.editing = true;
+        }
+    };
+
+    $scope.finish = function () {
+        $scope.$broadcast('complete', 'complete');
+        $scope.complete = true;
     };
 
 }]);
@@ -43,7 +50,20 @@ app.controller('group', ['$scope', '$timeout', function ($scope, $timeout) {
     $scope.startTime = 0;
     $scope.resting = false;
     $scope.newRunner = "";
+
     var interval = 50;
+
+    $scope.$on ('complete', function() {
+        if ($scope.running) {
+            $scope.stop();
+        }
+        if ($scope.resting) {
+            clearInterval($scope._$restInterval);
+
+        }
+        $scope.resting = false;
+
+    });
 
     $scope.$on('ready', function () {
         $scope.editing = false;
@@ -57,6 +77,12 @@ app.controller('group', ['$scope', '$timeout', function ($scope, $timeout) {
         $scope.resting = false;
         $scope.newRunner = "";
     });
+
+    $scope.remove = function ($group) {
+        if (confirm('Are you sure?')) {
+            delete $scope.$parent.groups[$group];
+        }
+    };
 
 
     $scope.$on('runner-split', function () {
@@ -122,8 +148,10 @@ app.controller('group', ['$scope', '$timeout', function ($scope, $timeout) {
     };
 
     $scope.AddRunner = function () {
-        $scope.runners.push ({name: $scope.newRunner, time: "00:00", splits: [], lastSplit: 0});
-        $scope.newRunner = "";
+        if ($scope.newRunner.length > 0) {
+            $scope.runners.push ({name: $scope.newRunner, time: "00:00", splits: [], lastSplit: 0});
+            $scope.newRunner = "";
+        }
     };
 
 }]);
@@ -135,6 +163,10 @@ app.controller('runner', ['$scope', '$timeout', function ($scope, $timeout) {
     var now = function () {
         return (new Date()).getTime();
     };
+
+    $scope.$on('complete', function () {
+        $scope.statusClass = 'bg-success';
+    });
 
     $scope.$on('start', function () {
         $scope.statusClass = 'bg-warning';

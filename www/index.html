@@ -5,7 +5,6 @@
   <title>Running For time</title>
   <link rel="stylesheet" href="css/bootstrap-darkly.min.css">
   <link rel="stylesheet" href="css/app.css">
-  <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> -->
   <script src="bower_components/angular/angular.min.js"></script>
   <script src="bower_components/angular-touch/angular-touch.min.js"></script>
   <script src="app/controllers.js"></script>
@@ -14,24 +13,34 @@
 <div class="container" ng-controller="app">
   <div class="row">
     <div class="col-xs-10">
-        <img src="/logo.png"/>
+        <img src="logo.png"/>
     </div>
     <div class="col-xs-2 text-right">
       <h1>
         <a class="btn btn-info" ng-hide="!editing" ng-click="begin();"><span class="glyphicon glyphicon-ok"></span></a>
         <a class="btn btn-danger" ng-hide="editing" ng-click="end()"><span class="glyphicon glyphicon-save"></span></a>
-        <a class="btn btn-danger" ng-click="reset()"><span class="glyphicon glyphicon-refresh"></span></a>
       </h1>
+    </div>
+  </div>
+  <div class="row well" ng-hide="editing">
+    <div class="col-xs-12 text-right">
+      <a class="btn btn-info"  ng-click="finish()"><span class="glyphicon glyphicon-check"></span> End</a>
     </div>
   </div>
   <div class="row">
     <div class="col-xs-12 runners-group well" ng-init="runners = runners" ng-repeat="(group, runners) in groups" ng-controller="group">
         <div class="row">
-          <div class="col-xs-6"><h2>{{ group }}</h2></div>
-          <div class="col-xs-4 text-right" ng-hide="resting">
+          <div class="col-xs-6">
+            <input type="text" style="width: 80%" class="form-control" ng-model="group" ng-hide="!editing">
+            <h2 ng-hide="editing">{{ group }}</h2>
+          </div>
+          <div class="col-xs-6 text-right" ng-show="editing">
+            <button class="btn btn-danger" ng-click="remove(group)"><span class="glyphicon glyphicon-remove-sign"></span></button>
+          </div>
+          <div class="col-xs-4 text-right" ng-hide="resting || editing">
             <h2> <span class="label label-success">Time: {{ runTime | timeify | date: 'mm:ss.sss' }}</span></h2>
           </div>
-          <div class="col-xs-4 text-right" ng-show="resting">
+          <div class="col-xs-4 text-right" ng-show="resting && !editing">
             <h2> <span class="label label-warning">Rest: {{ restTime | timeify | date: 'mm:ss.sss' }}</span></h2>
           </div>
           <div class="col-xs-2 text-right">
@@ -41,19 +50,28 @@
           </h2>
           </div>
         </div>
+      <div ng-show="editing">&nbsp;</div>
         <div class="row">
           <div class="col-xs-3 runner" ng-controller="runner" ng-init="runner = runner; group = $parent" ng-repeat="runner in runners">
                 <div class="runner-interaction {{ statusClass }}" ng-click="split()" >
-                  <div>{{ runner.name }} <span class="label label-info">{{ runner.lastSplit | timeify | date: 'mm:ss.sss' }}<span></div>
+                  <div>{{ runner.name }} <span class="label label-info" ng-hide="complete">{{ runner.lastSplit | timeify | date: 'mm:ss.sss' }}</span>
+                    <ul  ng-hide="!complete">
+                      <li ng-repeat="split in runner.splits">
+                        <span class="label label-info">{{ split | timeify | date: 'mm:ss.sss' }}</span>
+                      </li>
+                    </ul>
+                  </div>
               </div>
           </div>
         </div>
         <div class="row">
-          <div class="col-xs-4">
+          <div class="col-xs-6">
+            <div class="input-group">
             <input type="text" class="form-control" ng-hide="!editing" ng-model="newRunner" placeholder="Runners Name"/>
-          </div>
-          <div class="col-xs-4">
-            <a class="btn btn-primary" ng-hide="!editing" ng-click="AddRunner()">Add</a>
+            <span class="input-group-btn">
+              <button class="btn btn-info" ng-hide="!editing" ng-click="AddRunner()">Add</button>
+            </span>
+            </div>
           </div>
           <div class="col-xs-4 text-right">
           </div>
@@ -69,6 +87,9 @@
         </span>
       </div>
     </div>
+  </div>
+  <div class="row well">
+    <a class="btn btn-danger" ng-click="reset()"><span class="glyphicon glyphicon-fire"></span></a>
   </div>
 </div>
 
